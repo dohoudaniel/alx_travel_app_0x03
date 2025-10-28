@@ -147,7 +147,7 @@ CHAPA_SECRET_KEY = os.environ.get("CHAPA_SECRET_KEY")
 CHAPA_PUBLIC_KEY = os.environ.get("CHAPA_PUBLIC_KEY")
 CHAPA_BASE_URL = os.environ.get("CHAPA_BASE_URL", "https://api.chapa.co/v1")
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # "django.core.mail.backends.console.EmailBackend" (for development)
 EMAIL_HOST = os.environ.get("DJANGO_EMAIL_HOST")
 EMAIL_PORT = int(os.environ.get("DJANGO_EMAIL_PORT", 587))
 EMAIL_HOST_USER = os.environ.get("DJANGO_EMAIL_HOST_USER")
@@ -156,8 +156,9 @@ DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL")
 
 # Celery Configuration Options
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', CELERY_BROKER_URL)
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', "rpc://")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Lagos'  # or your timezone
+CELERY_ENABLE_UTC = True

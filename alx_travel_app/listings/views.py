@@ -9,12 +9,13 @@ import logging
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
-from .models import Payment
-from .serializers import PaymentSerializer
+from rest_framework import status, permissions, viewsets
+from .models import Payment, Booking
+from .serializers import PaymentSerializer, BookingSerializer
 from .tasks import send_payment_confirmation_email  # celery task
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
+from .tasks import send_booking_confirmation
 
 
 logger = logging.getLogger(__name__)
@@ -175,3 +176,28 @@ def chapa_webhook(request):
     else:
         payment.mark_failed(reason="webhook says not successful")
     return Response({"ok": True})
+
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+    def perform_create(self, serializer):
+        # Save booking instance
+        booking = serializer.save()
+        # Trigger the asynchronous email task
+        try:
+            send_booking_confirmation.delay(booking.id)
+        except Exception as exc:
+            # If the broker is down, decide how to handle: log, set flag, or fallback to immediate send
+            # Example: log the exception and continue
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception("Failed to dispatch booking confirmation task: %s", exc)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        booking = serializer.save()
+        send_booking_confirmation.delay(booking.id)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
