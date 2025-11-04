@@ -53,3 +53,10 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = "__all__"
         read_only_fields = ("status", "chapa_tx_id", "metadata", "created_at", "updated_at")
+
+
+class InitiatePaymentSerializer(serializers.Serializer):
+    booking_reference = serializers.CharField(required=True)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+    currency = serializers.CharField(required=True)
+    return_url = serializers.URLField(required=False, allow_blank=True)

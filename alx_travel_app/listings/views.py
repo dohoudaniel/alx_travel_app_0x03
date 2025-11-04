@@ -5,17 +5,18 @@ import os
 import requests
 import uuid
 import logging
-
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, viewsets
 from .models import Payment, Booking
-from .serializers import PaymentSerializer, BookingSerializer
+from .serializers import PaymentSerializer, BookingSerializer, InitiatePaymentSerializer
 from .tasks import send_payment_confirmation_email  # celery task
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from .tasks import send_booking_confirmation
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 logger = logging.getLogger(__name__)
@@ -201,3 +202,26 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = serializer.save()
         send_booking_confirmation.delay(booking.id)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PaymentViewSet(viewsets.ViewSet):
+    @swagger_auto_schema(
+        method='post',
+        request_body=InitiatePaymentSerializer,
+        responses={
+            201: openapi.Response('Created', schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'tx_ref': openapi.Schema(type=openapi.TYPE_STRING)
+                }
+            )),
+            400: 'Bad Request'
+        }
+    )
+    @action(detail=False, methods=['post'], url_path='initiate')
+    def initiate(self, request):
+        serializer = InitiatePaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        # ... your existing logic to create Payment and call Chapa ...
+        return Response({'tx_ref': 'abc123'}, status=status.HTTP_201_CREATED)
