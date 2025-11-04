@@ -39,3 +39,4 @@ wcwidth==0.2.14
 gunicorn
 psycopg2-binary
 django-redis
+whitenoise==6.5.0
