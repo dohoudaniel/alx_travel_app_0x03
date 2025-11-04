@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-1a$eg$d6ms4@bo(bco3ilr&=(!8xh_rody^ilm3vq=jac9w!_!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = 'https://my-alx-travel-app-api-v3.onrender.com'
 
 
 # Application definition
