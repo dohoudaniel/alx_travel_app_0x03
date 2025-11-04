@@ -163,6 +163,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Lagos'  # or your timezone
 CELERY_ENABLE_UTC = True
 
-SWAGGER_SETTINGS = {
-    "USE_SESSION_AUTH": False,
-}
+# SWAGGER_SETTINGS = {
+#     "USE_SESSION_AUTH": False,
+# }
