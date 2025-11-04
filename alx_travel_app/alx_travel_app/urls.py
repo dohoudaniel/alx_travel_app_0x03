@@ -32,6 +32,8 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    # important: do not include session authentication for this view
+    authentication_classes=(),  # <- this prevents session auth/login redirect
 )
 
 urlpatterns = [
