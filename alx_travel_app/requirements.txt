@@ -18,7 +18,6 @@ hiredis==3.3.0
 idna==3.11
 inflection==0.5.1
 kombu==5.5.4
-mysqlclient
 packaging==25.0
 prompt_toolkit==3.0.52
 pycparser==2.23
